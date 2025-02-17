@@ -34,9 +34,9 @@ services:
       data-station-network:
         ipv4_address: 172.20.14.82
 
-  weather-producer:
+  weather-source:
     build: .
-    container_name: weather_producer
+    container_name: weather_source
     pull_policy: build
     environment:
       - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
@@ -47,7 +47,7 @@ services:
       - kafka
     ports:
       - "8000:8000"
-    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    command: uvicorn main:app --host 0.0.0.0 --port 8011
     networks:
       data-station-network:
         ipv4_address: 172.20.14.83
