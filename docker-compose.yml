@@ -40,13 +40,14 @@ services:
     pull_policy: build
     environment:
       - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
-      # - BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS}
       - KAFKA_BROKER=${KAFKA_BROKER}
       - KAFKA_TOPIC=${KAFKA_TOPIC}
     depends_on:
       - kafka
     ports:
       - "8012:8012"
+    env_file:
+      - .env
     command: uvicorn main:app --host 0.0.0.0 --port 8012
     networks:
       data-station-network:
