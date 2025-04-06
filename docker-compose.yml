@@ -46,16 +46,16 @@ services:
     depends_on:
       - kafka
     ports:
-      - "8011:8011"
-    command: uvicorn main:app --host 0.0.0.0 --port 8011
+      - "8012:8012"
+    command: uvicorn main:app --host 0.0.0.0 --port 8012
     networks:
       data-station-network:
         ipv4_address: 172.20.14.83
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:8012/health"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8012/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
   data-station-network:
