@@ -40,19 +40,19 @@ services:
     pull_policy: build
     environment:
       - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
-      - BOOTSTRAP_SERVERS=weather
+      # - BOOTSTRAP_SERVERS=weather_kafka:9097
       - KAFKA_BROKER=${KAFKA_BROKER}
       - KAFKA_TOPIC=${KAFKA_TOPIC}
     depends_on:
       - kafka
     ports:
-      - "8012:8012"
-    command: uvicorn main:app --host 0.0.0.0 --port 8012
+      - "8011:8011"
+    command: uvicorn main:app --host 0.0.0.0 --port 8011
     networks:
       data-station-network:
         ipv4_address: 172.20.14.83
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8012/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8011/health"]
       interval: 30s
       timeout: 10s
       retries: 3

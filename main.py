@@ -18,6 +18,9 @@ def produce(producer: Producer) -> None:
 
 app = FastAPI()
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 kafka_broker = get_env_value('KAFKA_BROKER')
 kafka_topic = get_env_value('KAFKA_TOPIC')
