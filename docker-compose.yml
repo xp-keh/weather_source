@@ -40,7 +40,7 @@ services:
     pull_policy: build
     environment:
       - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
-      - BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS}
+      # - BOOTSTRAP_SERVERS=${BOOTSTRAP_SERVERS}
       - KAFKA_BROKER=${KAFKA_BROKER}
       - KAFKA_TOPIC=${KAFKA_TOPIC}
     depends_on:
