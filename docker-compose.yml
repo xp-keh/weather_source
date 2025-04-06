@@ -51,6 +51,11 @@ services:
     networks:
       data-station-network:
         ipv4_address: 172.20.14.83
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8012/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
   data-station-network:
