@@ -88,10 +88,10 @@ class Producer:
                         response_json["location"] = location
                         response_json["raw_produce_dt"] = int(datetime.now().timestamp() * 1_000_000)
 
-                        logger.debug(f"Fetched weather data for {location}: {response_json}")
+                        logger.info(f"Fetched weather data for {location}: {response_json}")
 
                         self._instance.send(self._kafka_topic, value=response_json)  # type: ignore
-                        logger.debug(f"Sent weather data for {location} to Kafka topic: {self._kafka_topic}")
+                        logger.info(f"Sent weather data for {location} to Kafka topic: {self._kafka_topic}")
 
                     except requests.exceptions.RequestException as e:
                         logger.error(f"Error fetching weather data for {location}: {e}")
