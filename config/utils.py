@@ -6,8 +6,6 @@ import os
 from functools import lru_cache
 from dotenv import load_dotenv, find_dotenv
 
-
-
 @lru_cache
 def setup_env() -> None:
     """

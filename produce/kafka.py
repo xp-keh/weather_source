@@ -13,9 +13,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class Producer:
-    """
-    Creates an instance of KafkaProducer with additional methods to produce dummy data.
-    """
     def __init__(self, kafka_broker: str, kafka_topic: str) -> None:
         self._kafka_server = kafka_broker
         self._kafka_topic = kafka_topic
@@ -24,9 +21,6 @@ class Producer:
     
 
     def create_instance(self) -> KafkaProducer: 
-        """
-        Creates new kafka producer and returns an instance of KafkaProducer.
-        """
         self.logger.info(" [*] Starting Kafka producer...")
         self._instance = KafkaProducer(
             bootstrap_servers=self._kafka_server,
@@ -36,9 +30,6 @@ class Producer:
         return self._instance
 
     def is_kafka_connected(self) -> bool:
-        """
-        Check if the Kafka cluster is available by fetching metadata.
-        """
         try:
             metadata = self._instance.bootstrap_connected() # type: ignore
             if metadata:
@@ -52,17 +43,11 @@ class Producer:
             return False
         
     def ensure_bytes(self, message) -> bytes:
-        """
-        Ensure the message is in byte format.
-        """
         if not isinstance(message, bytes):
             return bytes(message, encoding='utf-8')
         return message
     
     def produce(self) -> None:
-        """
-        Produces messages from a CSV file, simulating real-time data.
-        """
         try:
             self.logger.info(" [*] Starting real-time Kafka producer.")
             api_key = get_env_value('OPENWEATHER_API_KEY')
@@ -88,10 +73,7 @@ class Producer:
                         response_json["location"] = location
                         response_json["raw_produce_dt"] = int(datetime.now().timestamp() * 1_000_000)
 
-                        # logger.info(f"Fetched weather data for {location}: {response_json}")
-
                         self._instance.send(self._kafka_topic, value=response_json)  # type: ignore
-                        # logger.info(f"Sent weather data for {location} to Kafka topic: {self._kafka_topic}")
 
                     except requests.exceptions.RequestException as e:
                         logger.error(f"Error fetching weather data for {location}: {e}")

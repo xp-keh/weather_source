@@ -40,7 +40,6 @@ services:
     pull_policy: build
     environment:
       - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
-      # - BOOTSTRAP_SERVERS=weather_kafka:9097
       - KAFKA_BROKER=${KAFKA_BROKER}
       - KAFKA_TOPIC=${KAFKA_TOPIC}
     depends_on:
@@ -51,11 +50,6 @@ services:
     networks:
       data-station-network:
         ipv4_address: 172.20.14.83
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:8011/health"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
 
 networks:
   data-station-network:

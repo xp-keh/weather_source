@@ -7,9 +7,6 @@ import threading
 load_dotenv()
 
 def produce(producer: Producer) -> None:
-    """
-    Run producer instance.
-    """
     try:
         producer.create_instance()
         producer.produce()
