@@ -72,6 +72,8 @@ class Producer:
                         response_json = response.json()
                         response_json["location"] = location
                         response_json["raw_produce_dt"] = int(datetime.now().timestamp() * 1_000_000)
+                        response_json["lat"] = lat
+                        response_json["lon"] = lon
 
                         self._instance.send(self._kafka_topic, value=response_json)  # type: ignore
 
