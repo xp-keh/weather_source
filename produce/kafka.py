@@ -67,7 +67,7 @@ class Producer:
                     url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}"
 
                     try:
-                        response = requests.get(url)
+                        response = requests.get(url, timeout=5)
                         response.raise_for_status()
                         response_json = response.json()
                         response_json["location"] = location
@@ -77,7 +77,8 @@ class Producer:
 
                     except requests.exceptions.RequestException as e:
                         logger.error(f"Error fetching weather data for {location}: {e}")
-                        raise SystemExit(f"Stopping producer due to failure in fetching weather data for {location}")
+                        continue
+                        # raise SystemExit(f"Stopping producer due to failure in fetching weather data for {location}")
 
                 time.sleep(1)
 
