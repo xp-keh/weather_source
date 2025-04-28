@@ -79,6 +79,33 @@ class Producer:
                 "JAGI": ("-8.4702", "114.1521"),
             }
 
+            recent_data = {
+                "TNTI": "",
+                "TOLI": "",
+                "GENI": "",
+                "PMBI": "",
+                "BKB": "",
+                "SOEI": "",
+                "SANI": "",
+                "MMRI": "",
+                "PMBT": "",
+                "TOLI2": "",
+                "BKNI": "",
+                "UGM": "",
+                "FAKI": "",
+                "CISI": "",
+                "BNDI": "",
+                "PLAI": "",
+                "MNAI": "",
+                "GSI": "",
+                "SMRI": "",
+                "SAUI": "",
+                "YOGI": "",
+                "LHMI": "",
+                "LUWI": "",
+                "JAGI": "",
+            }
+
             while True:
                 for location, coords in locations.items():
                     lat, lon = coords
@@ -89,17 +116,20 @@ class Producer:
                         response = requests.get(url, timeout=5)
                         response.raise_for_status()
                         response_json = response.json()
-                        response_json["location"] = location
-                        response_json["raw_produce_dt"] = int(datetime.now().timestamp() * 1_000_000)
-                        response_json["lat"] = lat
-                        response_json["lon"] = lon
 
-                        self._instance.send(self._kafka_topic, value=response_json)  # type: ignore
+                        if response_json["dt"] != recent_data[location]:
+                            response_json["location"] = location
+                            response_json["raw_produce_dt"] = int(datetime.now().timestamp() * 1_000_000)
+                            response_json["lat"] = lat
+                            response_json["lon"] = lon
+                            self._instance.send(self._kafka_topic, value=response_json)  # type: ignore
+                            recent_data[location] = response_json["dt"]
+                        else:
+                            pass
 
                     except requests.exceptions.RequestException as e:
                         logger.error(f"Error fetching weather data for {location}: {e}")
                         continue
-                        # raise SystemExit(f"Stopping producer due to failure in fetching weather data for {location}")
 
                 time.sleep(1)
 
