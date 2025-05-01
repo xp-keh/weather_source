@@ -117,15 +117,15 @@ class Producer:
                         response.raise_for_status()
                         response_json = response.json()
 
-                        if response_json["dt"] != recent_data[location]:
-                            response_json["location"] = location
-                            response_json["raw_produce_dt"] = int(datetime.now().timestamp() * 1_000_000)
-                            response_json["lat"] = lat
-                            response_json["lon"] = lon
-                            self._instance.send(self._kafka_topic, value=response_json)  # type: ignore
-                            recent_data[location] = response_json["dt"]
-                        else:
-                            pass
+                        # if response_json["dt"] != recent_data[location]:
+                        response_json["location"] = location
+                        response_json["raw_produce_dt"] = int(datetime.now().timestamp() * 1_000_000)
+                        response_json["lat"] = lat
+                        response_json["lon"] = lon
+                        self._instance.send(self._kafka_topic, value=response_json)  # type: ignore
+                        # recent_data[location] = response_json["dt"]
+                        # else:
+                        #     pass
 
                     except requests.exceptions.RequestException as e:
                         logger.error(f"Error fetching weather data for {location}: {e}")
