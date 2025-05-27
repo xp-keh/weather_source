@@ -78,7 +78,7 @@ def produce(self) -> None:
 
                     self._instance.send(self._kafka_topic, value=response_json)  # type: ignore
 
-                    logger.info(f"Data sent to Kafka topic: {response_json}")
+                    self.logger.info(f"Data sent to Kafka topic: {response_json}")
 
                 except requests.exceptions.RequestException as e:
                     logger.error(f"Error fetching weather data for {location}: {e}")
