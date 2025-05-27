@@ -47,102 +47,49 @@ class Producer:
             return bytes(message, encoding='utf-8')
         return message
     
-    def produce(self) -> None:
-        try:
-            self.logger.info(" [*] Starting real-time Kafka producer.")
-            api_key = get_env_value('OPENWEATHER_API_KEY')
+def produce(self) -> None:
+    try:
+        self.logger.info(" [*] Starting real-time Kafka producer.")
+        api_key = get_env_value('OPENWEATHER_API_KEY')
 
-            locations = {
-                "TNTI": ("0.7718", "127.3667"),
-                "PMBI": ("-2.9024", "104.6993"),
-                "BKB": ("-1.1073", "116.9048"),
-                "SOEI": ("-9.7553", "124.2672"),
-                "MMRI": ("-8.6357", "122.2376"),
+        locations = {
+            "TNTI": ("0.7718", "127.3667"),
+            "PMBI": ("-2.9024", "104.6993"),
+            "BKB": ("-1.1073", "116.9048"),
+            "SOEI": ("-9.7553", "124.2672"),
+            "MMRI": ("-8.6357", "122.2376"),
+        }
 
-                # "FAKI": ("-2.91925", "132.24889"),
-                # "PLAI": ("-8.8275", "117.7765"),
-                # "MNAI": ("-4.3605", "102.9557"),
-                # "SMRI": ("-7.04915", "110.44067"),
-                # "LHMI": ("5.2288", "96.9472"),
+        while True:
+            for location, coords in locations.items():
+                lat, lon = coords
 
-                # "LUWI": ("-1.0418", "122.7717"),
-                # "JAGI": ("-8.4702", "114.1521"),
+                url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}"
 
-                # "TOLI2": ("1.11119", "120.78174"),
-                # "TOLI": ("1.1214", "120.7944"),
-                # "GENI": ("-2.5927", "140.1678"),
-                # "SANI": ("-2.0496", "125.9881"),
-                # "PMBT": ("-2.927", "104.772"),
-                # "YOGI": ("-7.8166", "110.2949"),       
-                # "BKNI": ("0.3262", "101.0396"),
-                # "UGM": ("-7.9125", "110.5231"),
-                # "CISI": ("-7.5557", "107.8153"),
-                # "BNDI": ("-4.5224", "129.9045"),
-                # "GSI": ("1.3039", "97.5755"),
-                # "SAUI": ("-7.9826", "131.2988"),
-            }
+                try:
+                    response = requests.get(url, timeout=5)
+                    response.raise_for_status()
+                    response_json = response.json()
 
-            recent_data = {
-                "TNTI": "",
-                "PMBI": "",
-                "BKB": "",
-                "SOEI": "",
-                "MMRI": "",
+                    response_json["location"] = location
+                    response_json["raw_produce_dt"] = int(datetime.now().timestamp() * 1_000_000)
+                    response_json["lat"] = lat
+                    response_json["lon"] = lon
 
-                # "FAKI": "",
-                # "PLAI": "",
-                # "MNAI": "",
-                # "SMRI": "",
-                # "LHMI": "",
+                    self._instance.send(self._kafka_topic, value=response_json)  # type: ignore
 
-                # "LUWI": "",
-                # "JAGI": "",
+                    logger.info(f"Data sent to Kafka topic: {response_json}")
 
-                # "TOLI2": "",
-                # "TOLI": "",
-                # "GENI": "",
-                # "SANI": "",
-                # "PMBT": "",
-                # "YOGI": "",
-                # "BKNI": "",
-                # "UGM": "",
-                # "CISI": "",
-                # "BNDI": "",
-                # "GSI": "",
-                # "SAUI": "",
-            }
+                except requests.exceptions.RequestException as e:
+                    logger.error(f"Error fetching weather data for {location}: {e}")
+                    continue
 
-            while True:
-                for location, coords in locations.items():
-                    lat, lon = coords
+            time.sleep(1)
 
-                    url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}"
-
-                    try:
-                        response = requests.get(url, timeout=5)
-                        response.raise_for_status()
-                        response_json = response.json()
-
-                        # if response_json["dt"] != recent_data[location]:
-                        response_json["location"] = location
-                        response_json["raw_produce_dt"] = int(datetime.now().timestamp() * 1_000_000)
-                        response_json["lat"] = lat
-                        response_json["lon"] = lon
-                        self._instance.send(self._kafka_topic, value=response_json)  # type: ignore
-                        # recent_data[location] = response_json["dt"]
-                        # else:
-                        #     pass
-
-                    except requests.exceptions.RequestException as e:
-                        logger.error(f"Error fetching weather data for {location}: {e}")
-                        continue
-
-                time.sleep(1)
-
-        except Exception as e:
-            pass
-            self.logger.error(f" Error in Kafka: {e}")
-            self.logger.info(" [*] Stopping data generation.")
-            os._exit(1)
-        finally:
-            self._instance.close()  # type: ignore
+    except Exception as e:
+        pass
+        self.logger.error(f" Error in Kafka: {e}")
+        self.logger.info(" [*] Stopping data generation.")
+        os._exit(1)
+    finally:
+        self._instance.close()  # type: ignore
