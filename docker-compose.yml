@@ -15,7 +15,7 @@ services:
         ipv4_address: 172.20.0.125
 
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.4.3
     container_name: weather_kafka
     depends_on:
       - zookeeper
